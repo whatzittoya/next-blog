@@ -12,7 +12,13 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  const graphQLClient = new GraphQLClient(graphqlAPI);
+  const graphQLClient = new GraphQLClient(graphqlAPI, {
+    Headers: {
+      authorization:
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNjY2NjAyODQwLCJleHAiOjE2NjkxOTQ4NDB9.eA_Nu1xe5OepvdOIrrnbAD9gvL5jPuDjkWnfPOhWfZ4",
+    },
+  });
+
   const query = gql`
     query getPosts {
       posts {
@@ -38,11 +44,31 @@ export default async function handler(
       }
     }
   `;
+
+  const login = gql`
+    mutation {
+      login(
+        input: { identifier: "visita@gmail.com", password: "123Comment." }
+      ) {
+        jwt
+      }
+    }
+  `;
+  // const registql=gql`mutation {
+  // register(input: { username: "username", email: "email", password: "password" }) {
+  //   jwt
+  //   user {
+  //     username
+  //     email
+  //   }
+  // }
+  // }`
+
   const result = await graphQLClient.request(query);
-  const res_map = result.posts.data.map((data) => ({
-    Title: data.attributes.Title,
-    Categories: data.attributes.Categories.data.map((cat) => cat.attributes),
-    Author: data.attributes.Author.data.attributes,
-  }));
-  return res.status(200).send(res_map);
+  // const res_map = result.posts.data.map((data) => ({
+  //   Title: data.attributes.Title,
+  //   Categories: data.attributes.Categories.data.map((cat) => cat.attributes),
+  //   Author: data.attributes.Author.data.attributes,
+  // }));
+  return res.status(200).send(result);
 }
