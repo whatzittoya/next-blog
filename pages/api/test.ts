@@ -14,8 +14,8 @@ export default async function handler(
 ) {
   const graphQLClient = new GraphQLClient(graphqlAPI, {
     Headers: {
-      authorization:
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNjY2NjAyODQwLCJleHAiOjE2NjkxOTQ4NDB9.eA_Nu1xe5OepvdOIrrnbAD9gvL5jPuDjkWnfPOhWfZ4",
+      Authorization:
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNjY2NjgzMzMyLCJleHAiOjE2NjkyNzUzMzJ9.NgNoA6rj5jZQ75udMpAgp8t_ZQuqNhjBKpbVbhj7ZfI",
     },
   });
 
