@@ -1,6 +1,6 @@
 import { request, gql } from "graphql-request";
 
-const graphqlAPI = process.env.NEXT_PUBLIC_GRAPHCMS_ENDPOINT;
+const graphqlAPI = process.env.STRAPI_API;
 
 export const getPosts = async () => {
   const query = gql`
@@ -49,7 +49,13 @@ export const getPosts = async () => {
     }
   `;
   const result = await request(graphqlAPI, query);
-  return result.posts.data.attribute;
+  // const res_map = result.posts.data.map((data) => ({
+  //   Title: data.attributes.Title,
+  //   Categories: data.attributes.Categories.data.map((cat) => cat.attributes),
+  //   Author: data.attributes.Author.data.attributes,
+  // }));
+
+  return result;
 };
 export const getPostDetails = async (slug) => {
   const query = gql`
@@ -129,20 +135,30 @@ export const getRecentPosts = async () => {
 
 export const getSimilarPosts = async (categories, slug) => {
   const query = gql`
-    query GetPostDetails($slug: String!, $categories: [String!]) {
+    query GetPostDetails(
+      $slug: String! = "new-post"
+      $categories: [String!] = ["Suhu", "Gaya"]
+    ) {
       posts(
-        where: {
-          slug_not: $slug
-          AND: { categories_some: { slug_in: $categories } }
+        filters: {
+          Slug: { ne: $slug }
+          Categories: { Name: { in: $categories } }
         }
-        last: 3
       ) {
-        title
-        featuredImage {
-          url
+        data {
+          attributes {
+            Title
+            FeaturedImage {
+              data {
+                attributes {
+                  url
+                }
+              }
+            }
+            createdAt
+            Slug
+          }
         }
-        createdAt
-        slug
       }
     }
   `;
