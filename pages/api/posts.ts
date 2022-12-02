@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Result } from "postcss";
-import { getPosts } from "../../services";
-import { getRecentPosts } from "../../services/index-strapi";
+import { getRecentPosts } from "../../services";
 
 export default async function handler(
   req: NextApiRequest,

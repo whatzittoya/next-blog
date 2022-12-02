@@ -1,25 +1,70 @@
-import { GraphQLClient, gql } from "graphql-request";
-import { getPosts } from "./strapi_gql";
+import {
+  ApolloClient,
+  InMemoryCache,
+  gql,
+  createHttpLink,
+} from "@apollo/client";
+import { setContext } from "@apollo/client/link/context";
+import transformJSON from "../src/lib/transformJSON";
 
-export const getRecentPosts = async () => {
-  const endpoint: string = process.env.STRAPI_API;
-
-  const graphQLClient = new GraphQLClient(endpoint, {
-    headers: {
-      authorization: process.env.STRAPI_TOKEN,
-    },
+export const getFeaturedPosts = async () => {
+  const cache = new InMemoryCache();
+  const graphqlAPI = process.env.NEXT_PUBLIC_API;
+  const token = process.env.NEXT_PUBLIC_TOKEN;
+  const httpLink = createHttpLink({
+    uri: graphqlAPI,
   });
 
+  const authLink = setContext((_, { headers }) => {
+    return {
+      headers: {
+        ...headers,
+        authorization: `Bearer ${token}`,
+      },
+    };
+  });
   const query = gql`
-    query getPosts {
-      post {
-        title
+    query {
+      posts(filters: { FeaturedPost: { eq: true } }) {
+        data {
+          attributes {
+            Author {
+              data {
+                attributes {
+                  Name
+                  Photo {
+                    data {
+                      attributes {
+                        url
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            FeaturedImage {
+              data {
+                attributes {
+                  url
+                }
+              }
+            }
+            Title
+            Slug
+            createdAt
+          }
+        }
       }
     }
   `;
 
-  const data = await graphQLClient.request(query);
-  console.log(endpoint);
-};
+  const client = new ApolloClient({
+    cache,
+    link: authLink.concat(httpLink),
+  });
 
-getRecentPosts().catch((error) => console.error(error));
+  const result = await client.query({
+    query,
+  });
+  return transformJSON(result.data.posts);
+};

@@ -9,7 +9,7 @@ import { setContext } from "@apollo/client/link/context";
 export default async function handler(req, res) {
   const cache = new InMemoryCache();
   const graphqlAPI = process.env.STRAPI_API;
-
+  const token = process.env.STRAPI_TOKEN;
   const httpLink = createHttpLink({
     uri: graphqlAPI,
   });
@@ -18,8 +18,7 @@ export default async function handler(req, res) {
     return {
       headers: {
         ...headers,
-        authorization:
-          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNjY2NjgzMzMyLCJleHAiOjE2NjkyNzUzMzJ9.NgNoA6rj5jZQ75udMpAgp8t_ZQuqNhjBKpbVbhj7ZfI",
+        authorization: `Bearer ${token}`,
       },
     };
   });
