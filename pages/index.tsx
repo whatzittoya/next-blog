@@ -4,7 +4,13 @@ import { PostCard, Categories, PostWidget } from "../components";
 import { getPosts } from "../services";
 import FeaturedPosts from "../sections/FeaturedPosts";
 import React from "react";
+import { GetPostsQuery, useGetPostsQuery } from "../src/generated/graphql";
+import graphqlRequestClient from "../src/lib/clients/graphqlRequestCLient";
 const Home: NextPage = ({ posts }) => {
+  const { isLoading, error, data } = useGetPostsQuery<GetPostsQuery, Error>(
+    graphqlRequestClient,
+    {}
+  );
   return (
     <div className="container mx-auto px-10 mb-8">
       <Head>

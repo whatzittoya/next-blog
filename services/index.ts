@@ -1,6 +1,9 @@
 import { request, gql, GraphQLClient } from "graphql-request";
 import transformJSON, { transformJSONObj } from "../src/lib/transformJSON";
 
+import { GetPostsQuery, useGetPostsQuery } from "../src/generated/graphql";
+import graphqlRequestClient from "../src/lib/clients/graphqlRequestCLient";
+
 const graphqlAPI = process.env.NEXT_PUBLIC_API;
 const token = process.env.NEXT_PUBLIC_TOKEN;
 
@@ -8,6 +11,10 @@ const graphQLClient = new GraphQLClient(graphqlAPI);
 graphQLClient.setHeader("authorization", `Bearer ${token}`);
 
 export const getPosts = async () => {
+  const { isLoading, error, data } = useGetPostsQuery<GetPostsQuery, Error>(
+    graphqlRequestClient,
+    {}
+  );
   const query = gql`
     query {
       posts {
@@ -60,7 +67,7 @@ export const getPosts = async () => {
   //   Author: data.attributes.Author.data.attributes,
   // }));
 
-  return transformJSON(result.posts);
+  return transformJSON(data?.posts);
 };
 export const getPostDetails = async (slug) => {
   const query = gql`
@@ -262,28 +269,43 @@ export const getFeaturedPosts = async () => {
 export const getCategoryPost = async (slug) => {
   const query = gql`
     query GetCategoryPost($slug: String!) {
-      postsConnection(where: { categories_some: { slug: $slug } }) {
-        edges {
-          cursor
-          node {
-            author {
-              bio
-              name
-              id
-              photo {
-                url
+      posts(filters: { Categories: { Slug: { eq: $slug } } }) {
+        data {
+          attributes {
+            Author {
+              data {
+                id
+                attributes {
+                  Bio
+                  Name
+                  Photo {
+                    data {
+                      attributes {
+                        url
+                      }
+                    }
+                  }
+                }
               }
             }
             createdAt
-            slug
-            title
-            excerpt
-            featuredImage {
-              url
+            Slug
+            Title
+            Excerpt
+            FeaturedImage {
+              data {
+                attributes {
+                  url
+                }
+              }
             }
-            categories {
-              name
-              slug
+            Categories {
+              data {
+                attributes {
+                  Name
+                  Slug
+                }
+              }
             }
           }
         }
@@ -293,5 +315,5 @@ export const getCategoryPost = async (slug) => {
 
   const result = await graphQLClient.request(query, { slug });
 
-  return transformJSON(result.postsConnection.edges);
+  return transformJSON(result.posts);
 };

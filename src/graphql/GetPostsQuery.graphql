@@ -1,0 +1,43 @@
+query GetPosts {
+  posts {
+    data {
+      attributes {
+        Title
+        Slug
+        Excerpt
+        FeaturedImage {
+          data {
+            attributes {
+              url
+            }
+          }
+        }
+        createdAt
+        Author {
+          data {
+            id
+            attributes {
+              Name
+              Bio
+              Photo {
+                data {
+                  attributes {
+                    url
+                  }
+                }
+              }
+            }
+          }
+        }
+        Categories {
+          data {
+            attributes {
+              Name
+              Slug
+            }
+          }
+        }
+      }
+    }
+  }
+}
